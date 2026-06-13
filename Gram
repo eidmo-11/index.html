@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-select=none">
+    <title>Gram Network</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background-color: #f3f4f6;
+            color: #111827;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+        .top-status-bar {
+            background-color: #f3f4f6;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .close-btn {
+            background: #9ca3af;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .header-title-badge {
+            background: black;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .header-title-badge::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+        }
+        .more-btn {
+            color: #4b5563;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 12px 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+        }
+        .balance-label {
+            color: #9ca3af;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .balance-amount {
+            font-size: 28px;
+            font-weight: 800;
+            margin-top: 4px;
+            color: #000;
+        }
+        .balance-usd {
+            color: #10b981;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .wallet-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .wallet-icon-box {
+            background: #eff6ff;
+            padding: 12px;
+            border-radius: 16px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+        .btn-action {
+            flex: 1;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-blue {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-gray {
+            background: #f3f4f6;
+            color: #1f2937;
+        }
+        .mining-panel {
+            background: #ef4444;
+            color: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 12px 16px;
+        }
+        .mining-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .mining-item-title {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .mining-item-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .mining-item-sub {
+            font-size: 11px;
+            color: #10b981;
+            margin-top: 2px;
+        }
+        .mining-progress-container {
+            margin-top: 15px;
+        }
+        .mining-progress-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+        .progress-bar-bg {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background: #10b981;
+            height: 100%;
+            width: 75%;
+            border-radius: 10px;
+        }
+        .mining-footer-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            font-size: 13px;
+        }
+        .input-group {
+            background: #f3f4f6;
+            border-radius: 14px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .input-group input {
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            width: 70%;
+        }
+        .input-group select {
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            font-weight: bold;
+            color: #2563eb;
+            outline: none;
+            cursor: pointer;
+        }
+        .input-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #4b5563;
+            margin-top: 12px;
+        }
+        .btn-submit {
+            background: #2563eb;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            margin-top: 18px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.03);
+            z-index: 100;
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 12px;
+            color: #9ca3af;
+            cursor: pointer;
+            flex: 1;
+            font-weight: 500;
+        }
+        .nav-item svg {
+            width: 22px;
+            height: 22px;
+            margin-bottom: 4px;
+            fill: currentColor;
+        }
+        .nav-item.active {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            color: #d1d5db;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-status-bar">
+        <button class="close-btn" onclick="window.close()">إغلاق ✕</button>
+        <div class="header-title-badge" id="header-badge-text">Gram Network</div>
+        <div class="more-btn">⋮</div>
+    </div>
+
+    <div id="page-home" class="page active">
+        <div class="card">
+            <div class="wallet-card-header">
+                <div>
+                    <div class="balance-label">Total Balance</div>
+                    <div class="balance-amount" id="home-grm-balance">22.69 GRM</div>
+                    <div class="balance-usd">≈ $<span id="home-usd-balance">0.00</span> USD</div>
+                </div>
+                <div class="wallet-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M19 7H5C3.89543 7 3 7.89543 3 9V17C3 18.1046 3.89543 19 5 19H19C20.1046 19 21 18.1046 21 17V9C21 7.89543 20.1046 7 19 7Z" stroke="#2563eb" stroke-width="2" stroke-linejoin="round"/><path d="M3 11H21" stroke="#2563eb" stroke-width="2"/><path d="M16 14H17" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <div class="mining-panel">
+            <div class="mining-grid">
+                <div>
+                    <div class="mining-item-title">⏱️ Mining Rate</div>
+                    <div class="mining-item-value">0.24 GRM / hour</div>
+                    <div class="mining-item-sub">+0% than yesterday</div>
+                </div>
+                <div>
+                    <div class="mining-item-title">⚡ Mining Power</div>
+                    <div class="mining-item-value">24 GH/s</div>
+                    <div class="mining-item-sub">+0% than yesterday</div>
+                </div>
+            </div>
+
+            <div class="mining-progress-container">
+                <div class="mining-progress-status">
+                    <div style="display:flex; align-items:center; gap:6px;"><span style="width:8px; height:8px; background:#10b981; border-radius:50%;"></span>Mining...</div>
+                    <div>00:44:08</div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div class="mining-footer-stats">
+                <div>🪙 Tokens Earned:<br><strong style="font-size:15px;" id="earned-tokens">5.44 GRM</strong></div>
+                <div style="text-align: right;">⚡ Energy:<br><strong style="font-size:15px;">100 / 100</strong></div>
+            </div>
+        </div>
+
+        <div style="padding: 0 16px;">
+            <button class="btn-action btn-blue" style="width: 100%; padding: 16px; border-radius: 16px;" onclick="alert('التعدين نشط ويعمل حالياً بكفاءة!')">⚒️ Working...</button>
+        </div>
+    </div>
+
+    <div id="page-wallet" class="page">
+        <div class="card">
+            <div class="wallet-card-header">
+                <div>
+                    <div class="balance-label">Available Balance</div>
+                    <div class="balance-amount" id="wallet-grm-balance">22.69 GRM</div>
+                    <div class="balance-usd">≈ $<span id="wallet-usd-balance">0.00</span> USD</div>
+                </div>
+                <div class="wallet-icon-box">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#2563eb" stroke-width="2"/><path d="M12 7V17M7 12H17" stroke="#2563eb" stroke-width="2" stroke-linecap="round"/></svg>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-action btn-blue">✈️ Send</button>
+                <button class="btn-action btn-gray">📥 Receive</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3 style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">💱 تحويل العملة (Swap)</h3>
+            <p style="font-size: 12px; color: #9ca3af; margin-bottom: 15px;">قم بتحويل عملات GRM المستخرجة مباشرة إلى عملات رقمية أخرى.</p>
+            
+            <div class="input-label">من (From)</div>
+            <div class="input-group">
+                <input type="number" id="swap-from-amount" placeholder="0.0" oninput="liveCalculateSwap()">
+                <select id="from-asset"><option value="GRM">GRM</option></select>
+            </div>
+
+            <div style="text-align: center; margin: 10px 0; color: #9ca3af; font-size: 18px; font-weight: bold;">⬇️</div>
+
+            <div class="input-label">إلى (To)</div>
+            <div class="input-group">
+                <input type="number" id="swap-to-amount" placeholder="0.0" disabled>
+                <select id="to-asset" onchange="liveCalculateSwap()">
+                    <option value="USDT">USDT</option>
+                    <option value="TON">TON</option>
+                </select>
+            </div>
+
+            <button class="btn-submit" onclick="processSwapOperation()">تأكيد عملية التحويل</button>
+        </div>
+    </div>
+
+    <div id="page-tasks" class="page">
+        <div class="empty-state">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+            <p style="font-size: 16px; font-weight: bold; color: #4b5563;">No tasks available right now.</p>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div id="tab-home" class="nav-item active" onclick="navigateToTab('page-home', 'tab-home', 'Gram Network')">
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <div>Home</div>
+        </div>
+        <div id="tab-wallet" class="nav-item" onclick="navigateToTab('page-wallet', 'tab-wallet', 'My Wallet')">
+            <svg viewBox="0 0 24 24"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+            <div>Wallet</div>
+        </div>
+        <div class="nav-item" onclick="alert('Staking Pool: Coming Soon!')">
+            <svg viewBox="0 0 24 24"><path d="M4 14h16v2H4zm0-4h16v2H4zm0-4h16v2H4zm0 12h16v2H4z"/></svg>
+            <div>Staking</div>
+        </div>
+        <div id="tab-tasks" class="nav-item" onclick="navigateToTab('page-tasks', 'tab-tasks', 'Task Center')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z"/></svg>
+            <div>Tasks</div>
+        </div>
+    </div>
+
+    <script>
+        let currentBalance = 22.69;
+        const GRM_CONVERSION_RATE = 0.08; 
+
+        function refreshInterfaceBalances() {
+            document.getElementById('home-grm-balance').innerText = currentBalance.toFixed(2) + " GRM";
+            document.getElementById('wallet-grm-balance').innerText = currentBalance.toFixed(2) + " GRM";
+            let usdValue = currentBalance * GRM_CONVERSION_RATE;
+            document.getElementById('home-usd-balance').innerText = usdValue.toFixed(2);
+            document.getElementById('wallet-usd-balance').innerText = usdValue.toFixed(2);
+        }
+
+        function navigateToTab(pageId, tabId, titleText) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('header-badge-text').innerText = titleText;
+        }
+
+        function liveCalculateSwap() {
+            let fromAmount = parseFloat(document.getElementById('swap-from-amount').value) || 0;
+            let targetAsset = document.getElementById('to-asset').value;
+            let targetRate = targetAsset === 'USDT' ? GRM_CONVERSION_RATE : (GRM_CONVERSION_RATE / 6.5);
+            document.getElementById('swap-to-amount').value = (fromAmount * targetRate).toFixed(4);
+        }
+
+        function processSwapOperation() {
+            let inputAmount = parseFloat(document.getElementById('swap-from-amount').value);
+            if (!inputAmount || inputAmount <= 0 || inputAmount > currentBalance) {
+                alert("رصيد GRM الخاص بك غير كافٍ أو القيمة خاطئة!");
+                return;
+            }
+            let targetAsset = document.getElementById('to-asset').value;
+            let targetRate = targetAsset === 'USDT' ? GRM_CONVERSION_RATE : (GRM_CONVERSION_RATE / 6.5);
+            let finalOutput = inputAmount * targetRate;
+            currentBalance -= inputAmount;
+            refreshInterfaceBalances();
+            alert(`✅ تمت عملية التحويل بنجاح!\nتم تحويل ${inputAmount} GRM إلى ${finalOutput.toFixed(4)} ${targetAsset}`);
+            document.getElementById('swap-from-amount').value = '';
+            document.getElementById('swap-to-amount').value = '';
+        }
+        refreshInterfaceBalances();
+    </script>
+</body>
+</html>
